@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H4X Streamer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+JP:wght@400;700&family=Orbitron:wght@800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', 'Noto Sans JP', 'Meiryo', sans-serif;
+      background: black;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    canvas#matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      border: 1px solid #00FF00;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+    
+    h1, h2 {
+      /* Using Orbitron just for headers */
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 15px #00FF00;
+      margin-bottom: 20px;
+    }
+
+    /* --- GLITCH ANIMATION CSS --- */
+    h1.glitch {
+      position: relative;
+      display: inline-block;
+      font-weight: 800; /* Make header extra bold for glitch */
+    }
+    h1.glitch::before,
+    h1.glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    h1.glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 #00ffff;
+      clip-path: inset(0 0 0 0);
+      animation: glitch-anim-1 2s infinite linear alternate-reverse;
+    }
+    h1.glitch::after {
+      left: -2px;
+      text-shadow: -2px 0 #ff00ff;
+      clip-path: inset(0 0 0 0);
+      animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    }
+    @keyframes glitch-anim-1 {
+      0% { clip-path: inset(80% 0 9% 0); }
+      5% { clip-path: inset(34% 0 49% 0); }
+      10% { clip-path: inset(96% 0 3% 0); }
+      15% { clip-path: inset(2% 0 96% 0); }
+      20% { clip-path: inset(87% 0 13% 0); }
+      25% { clip-path: inset(56% 0 1% 0); }
+      30% { clip-path: inset(27% 0 17% 0); }
+      35% { clip-path: inset(67% 0 32% 0); }
+      40% { clip-path: inset(42% 0 50% 0); }
+      45% { clip-path: inset(13% 0 82% 0); }
+      50% { clip-path: inset(40% 0 37% 0); }
+      55% { clip-path: inset(72% 0 18% 0); }
+      60% { clip-path: inset(96% 0 4% 0); }
+      65% { clip-path: inset(36% 0 33% 0); }
+      70% { clip-path: inset(84% 0 10% 0); }
+      75% { clip-path: inset(1% 0 53% 0); }
+      80% { clip-path: inset(44% 0 49% 0); }
+      85% { clip-path: inset(92% 0 5% 0); }
+      90% { clip-path: inset(34% 0 54% 0); }
+      95% { clip-path: inset(68% 0 22% 0); }
+      100% { clip-path: inset(36% 0 59% 0); }
+    }
+    @keyframes glitch-anim-2 {
+      0% { clip-path: inset(12% 0 55% 0); }
+      5% { clip-path: inset(89% 0 8% 0); }
+      10% { clip-path: inset(8% 0 87% 0); }
+      15% { clip-path: inset(64% 0 13% 0); }
+      20% { clip-path: inset(25% 0 3% 0); }
+      25% { clip-path: inset(94% 0 5% 0); }
+      30% { clip-path: inset(23% 0 54% 0); }
+      35% { clip-path: inset(63% 0 25% 0); }
+      40% { clip-path: inset(6% 0 58% 0); }
+      45% { clip-path: inset(92% 0 6% 0); }
+      50% { clip-path: inset(42% 0 2% 0); }
+      55% { clip-path: inset(77% 0 18% 0); }
+      60% { clip-path: inset(8% 0 46% 0); }
+      65% { clip-path: inset(37% 0 53% 0); }
+      70% { clip-path: inset(64% 0 26% 0); }
+      75% { clip-path: inset(90% 0 5% 0); }
+      80% { clip-path: inset(36% 0 48% 0); }
+      85% { clip-path: inset(2% 0 92% 0); }
+      90% { clip-path: inset(12% 0 68% 0); }
+      95% { clip-path: inset(97% 0 2% 0); }
+      100% { clip-path: inset(27% 0 49% 0); }
+    }
+    /* --------------------------- */
+
+    /* --- TAB BUTTON (Reverted to original sizes) --- */
+    .tab-button {
+      padding: 12px 25px;
+      margin: 10px 10px 10px 0;
+      font-size: 16px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #39FF14, #00FF00); 
+      color: black;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #39FF14; 
+    }
+    .tab-button:hover {
+      background: linear-gradient(90deg, #00FF00, #39FF14);
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #39FF14;
+    }
+
+    .tab-content {
+      display: none;
+      padding-top: 20px;
+      text-align: center;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    /* --- ACTION BUTTONS (Reverted to original sizes) --- */
+    button {
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: linear-gradient(45deg, #00FF00, #32CD32); 
+      border: 1px solid #00FF00;
+      color: black;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: 0.3s;
+      box-shadow: 0 0 15px #00FF00; 
+    }
+    button:hover {
+      background: linear-gradient(45deg, #32CD32, #00FF00);
+      transform: scale(1.1);
+      box-shadow: 0 0 25px #00FF00, 0 0 50px #00FF00; 
+    }
+
+    .console {
+      background: black;
+      color: #00FF00;
+      padding: 12px;
+      height: 150px;
+      overflow-y: auto;
+      margin-top: 30px;
+      text-align: left;
+      font-family: monospace;
+      border-radius: 8px;
+      border: 1px solid #00FF00;
+      box-shadow: inset 0 0 10px #003300;
+      white-space: pre-wrap;
+    }
+    select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      background: #000;
+      color: #00FF00;
+      border: 1px solid #00FF00;
+      margin-bottom: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 5px #00FF00;
+    }
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 15px #00FF00;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <h1 class="glitch" data-text="H4X STREAMER">H4X STREAMER</h1>
+  <div class="container">
+    <div>
+      <button class="tab-button" onclick="showTab('aimbot')">Aimbot</button>
+    </div>
+    <div id="aimbot" class="tab-content active">
+      <h2>Aimbot Settings</h2>
+      <select id="aimbot-type" onchange="updateAimbotType()">
+        <option value="enableAimHead">Aimbot Head</option>
+        <option value="enableAimDrag">Aimbot Drag</option>
+        <option value="enableAimDragPro">Aimbot Drag Pro</option>
+      </select>
+      <div class="button-group">
+        <button onclick="sendCommand(document.getElementById('aimbot-type').value)">Load Aimbot</button>
+        <button onclick="sendCommand('reapply')">Aimbot ON</button>
+        <button onclick="sendCommand('restore')">Aimbot OFF</button>
+        <button onclick="sendCommand('rescan')">Rescan Aimbot</button>
+      </div>
+    </div>
+    <div class="console" id="console-output"></div>
+  </div>
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+    function sendCommand(command) {
+      const consoleOutput = document.getElementById('console-output');
+      consoleOutput.innerHTML += `[Command Sent]: ${command}\n`;
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+      fetch(window.location.origin + '/', { 
+        method: 'POST', 
+        body: command 
+      }).then(response => {
+        if (command === 'enableAimHead' || command === 'enableAimDrag' || command === 'enableAimDragPro' || command === 'rescan') {
+          consoleOutput.innerHTML += `[Aimbot ${command === 'rescan' ? 'Rescanned' : 'Applied'} Successfully]\n`;
+          consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+      });
+    }
+    function updateAimbotType() {
+      const consoleOutput = document.getElementById('console-output');
+      const selectedType = document.getElementById('aimbot-type');
+      const displayText = selectedType.options[selectedType.selectedIndex].text;
+      consoleOutput.innerHTML += `[${displayText} Selected]\n`;
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const letters = 'アィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヵヶ1234567890';
+    
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for(let x = 0; x < columns; x++) drops[x] = 1;
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
+      for(let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 33);
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  </script>
+</body>
+</html>
